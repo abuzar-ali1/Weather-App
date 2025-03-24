@@ -3,6 +3,7 @@ import { IoSearch } from 'react-icons/io5'
 import { MdOutlineLocationOn, MdOutlineMyLocation, MdWbSunny } from 'react-icons/md'
 
 type Props = {
+  className?: string;
     value: string;
     onChange: React.ChangeEventHandler<HTMLInputElement> | undefined;
     onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
@@ -10,7 +11,7 @@ type Props = {
 
 export default function Navbar(props: Props) {
   return (
-    <nav className='shadow-sm sticky top-0 left-0 z-50 bg-white'>
+    <nav className='shadow-sm w-screen sticky top-0 left-0 z-50 bg-white'>
     <div className='h-[70px] flex justify-between items-center max-w-7xl px-3 mx-auto'>
         <div className='flex justify-center items-center gap-2'>
             <h2 className='text-gray-500 text-3xl'>Wheater</h2>
