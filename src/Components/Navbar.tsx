@@ -3,7 +3,7 @@ import { IoSearch } from 'react-icons/io5'
 import { MdOutlineLocationOn, MdOutlineMyLocation, MdWbSunny } from 'react-icons/md'
 
 type Props = {
-  className?: string;
+    className?: string;
     value: string;
     onChange: React.ChangeEventHandler<HTMLInputElement> | undefined;
     onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
