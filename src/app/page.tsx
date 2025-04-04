@@ -3,6 +3,7 @@ import Container from "@/Components/Container";
 import WeatherDetails from "@/Components/WeatherDetails";
 import Navbar from "@/Components/Navbar";
 import WeatherIcon from "@/Components/WeatherIcon";
+import ForecastWeatherDetails from "@/Components/ForecastWeatherDetails";
 import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -92,7 +93,21 @@ export default function Home() {
       return data;
     },
   });
-
+// Create a unique array of dates (in "YYYY-MM-DD" format)
+  const uniqueDates = [
+    ...new Set(
+      data?.list.map((entry) =>
+        new Date(entry.dt * 1000).toISOString().split("T")[0]
+      ) || []
+    ),
+  ];
+  const firstDataForEachDate = uniqueDates.map((date)=>{ 
+    return data?.list.find((entry)=>{
+      const entryDate =  new Date(entry.dt * 1000).toISOString().split('T')[0]
+      const entryTime =  new Date(entry.dt * 1000).getHours();
+      return entryDate === date && entryTime >= 6
+    })
+  })
   
   const date = data?.list[0]?.dt_txt
     ? new Date(data?.list[0].dt_txt)
@@ -111,7 +126,7 @@ export default function Home() {
 
   if (isPending)
     return (
-      <div className="d-flex items-center min-h-screen justify-center">
+      <div className="flex items-center min-h-screen justify-center">
         <p className="animate-bounce">Loading...</p>
       </div>
     );
@@ -204,10 +219,33 @@ export default function Home() {
 
         {/* 7 day forecast data */}
 
-        <section className="flex flex-col gap-4">
+        <section className="flex  w-full flex-col gap-4">
           <p className="text-2xl">Forecast (7 days)</p>
+        {firstDataForEachDate.map((d,i)=>(
+          <>
+          <ForecastWeatherDetails 
+              key={i} 
+              description={d?.weather[0].description ?? ""}
+              weatherIcon={d?.weather[0].icon ?? "01d"}
+              date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
+              day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
+              feels_like={Math.floor(d?.main.feels_like ?? 0)}
+              temp={Math.floor(d?.main.temp ?? 0)}
+              min_temp={d?.main.temp_min ?? 0}
+              max_temp={Math.floor(d?.main.temp_max ?? 0)}
+              airPressure={`${d?.main.pressure} hpa`}
+              humidity={`${d?.main.humidity}%`}
+              sunrise={format(fromUnixTime(data?.city.sunrise ?? 107325628), "h:mm a")}
+              sunset={format(fromUnixTime(data?.city.sunset ?? 1093772822), "h:mm a")}
+              visability={metersToKm(d?.visibility ?? 1000)}
+              windSpeed={`${d?.wind.speed} km/h`}
+            />
+          </>
+        ))}
         </section>
+
       </main>
     </div>
   );
 }
+        
