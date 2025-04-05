@@ -94,7 +94,6 @@ export default function Home() {
     },
   });
 
-  console.log(data)
 // Create a unique array of dates (in "YYYY-MM-DD" format)
   const uniqueDates = [
     ...new Set(
@@ -140,7 +139,6 @@ export default function Home() {
     console.log("Search for:", searchValue);
     // Add your search logic here
   };
-  console.log(typeof(firstDataForEachDate[0]?.main.pressure))
   return (
     <div className="flex flex-col items-center gap-4 bg-gray-100 min-h-screen">
       <Navbar
