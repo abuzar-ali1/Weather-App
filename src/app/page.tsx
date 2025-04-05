@@ -83,7 +83,7 @@ type Coordinates = {
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
 
-  const { isPending, error, data } = useQuery<WeatherData>({
+  const { isPending, data } = useQuery<WeatherData>({
     queryKey: ["repoData"],
     queryFn: async () => {
       const { data } = await axios.get(
@@ -93,6 +93,8 @@ export default function Home() {
       return data;
     },
   });
+
+  console.log(data)
 // Create a unique array of dates (in "YYYY-MM-DD" format)
   const uniqueDates = [
     ...new Set(
@@ -138,7 +140,7 @@ export default function Home() {
     console.log("Search for:", searchValue);
     // Add your search logic here
   };
-
+  console.log(typeof(firstDataForEachDate[0]?.main.pressure))
   return (
     <div className="flex flex-col items-center gap-4 bg-gray-100 min-h-screen">
       <Navbar
@@ -222,7 +224,7 @@ export default function Home() {
         <section className="flex  w-full flex-col gap-4">
           <p className="text-2xl">Forecast (7 days)</p>
         {firstDataForEachDate.map((d,i)=>(
-          <>
+          
           <ForecastWeatherDetails 
               key={i} 
               description={d?.weather[0].description ?? ""}
@@ -240,7 +242,7 @@ export default function Home() {
               visability={metersToKm(d?.visibility ?? 1000)}
               windSpeed={`${d?.wind.speed} km/h`}
             />
-          </>
+        
         ))}
         </section>
 

@@ -16,15 +16,7 @@ export interface WeatherDetails{
 }
 
 export default function WeatherDetails(props : WeatherDetails) {
-    const {
-        visability= "25km",
-        airPressure= "1012 hpa",
-        humidity = "61%",
-        sunrise="6:00 AM",
-        sunset="6:00 PM",
-        windSpeed="7 km/h",
-    } = props
-    
+   
   return (
     <>
     <SingleWeatherDetail

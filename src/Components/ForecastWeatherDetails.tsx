@@ -1,9 +1,12 @@
 import React from 'react'
 import Container from './Container'
 import WeatherIcon from './WeatherIcon'
-import WeatherDetails from './WeatherDetails'
+import WeatherDetails, {
+  WeatherDetails as WeatherDetailsType,    
+} from './WeatherDetails'
 
-export interface ForecastWeatherDetailsProps extends WeatherDetails {
+
+export interface ForecastWeatherDetailsProps extends WeatherDetailsType {
   weatherIcon: string;
   date: string;
   day: string;
@@ -22,8 +25,6 @@ export default function ForecastWeatherDetails(props: ForecastWeatherDetailsProp
     description = "Clear Sky",
     temp = 25,
     feels_like = 27,
-    min_temp = 20,
-    max_temp = 30,
   } = props;
 
   return (
