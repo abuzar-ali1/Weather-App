@@ -81,13 +81,12 @@ type Coordinates = {
 };
 
 export default function Home() {
-  const [searchValue, setSearchValue] = useState("");
 
   const { isPending, data } = useQuery<WeatherData>({
     queryKey: ["repoData"],
     queryFn: async () => {
       const { data } = await axios.get(
-        "https://api.openweathermap.org/data/2.5/forecast?q=khairpur,Pakistan&appid=3f2dad944555842efaa81613814063d3&units=metric"
+        "https://api.openweathermap.org/data/2.5/forecast?q=khairpur&appid=3f2dad944555842efaa81613814063d3&units=metric"
       );
 
       return data;
@@ -131,21 +130,10 @@ export default function Home() {
         <p className="animate-bounce">Loading...</p>
       </div>
     );
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-  };
-  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log("Search for:", searchValue);
-    // Add your search logic here
-  };
+
   return (
     <div className="flex flex-col items-center gap-4 bg-gray-100 min-h-screen">
-      <Navbar
-        value="" // Pass an empty string or a state variable for controlled input
-        onChange={handleInputChange} // Pass the change handler
-        onSubmit={handleFormSubmit} // Pass the submit handler
-      />
+      <Navbar/>
 
       <main className="px-3 max-w-7xl max-auto flex flex-col gap-9 w-full pb-10 pt-4">
         <section className="space-y-4">
@@ -222,26 +210,25 @@ export default function Home() {
         <section className="flex  w-full flex-col gap-4">
           <p className="text-2xl">Forecast (7 days)</p>
         {firstDataForEachDate.map((d,i)=>(
-          
-          <ForecastWeatherDetails 
-              key={i} 
-              description={d?.weather[0].description ?? ""}
-              weatherIcon={d?.weather[0].icon ?? "01d"}
-              date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
-              day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
-              feels_like={Math.floor(d?.main.feels_like ?? 0)}
-              temp={Math.floor(d?.main.temp ?? 0)}
-              min_temp={d?.main.temp_min ?? 0}
-              max_temp={Math.floor(d?.main.temp_max ?? 0)}
-              airPressure={`${d?.main.pressure} hpa`}
-              humidity={`${d?.main.humidity}%`}
-              sunrise={format(fromUnixTime(data?.city.sunrise ?? 107325628), "h:mm a")}
-              sunset={format(fromUnixTime(data?.city.sunset ?? 1093772822), "h:mm a")}
-              visability={metersToKm(d?.visibility ?? 1000)}
-              windSpeed={`${d?.wind.speed} km/h`}
-            />
-        
-        ))}
+                    <ForecastWeatherDetails 
+                    key={i} 
+                    description={d?.weather[0].description ?? ""}
+                    weatherIcon={d?.weather[0].icon ?? "01d"}
+                    date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
+                    day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
+                    feels_like={Math.floor(d?.main.feels_like ?? 0)}
+                    temp={Math.floor(d?.main.temp ?? 0)}
+                    min_temp={d?.main.temp_min ?? 0}
+                    max_temp={Math.floor(d?.main.temp_max ?? 0)}
+                    airPressure={`${d?.main.pressure} hpa`}
+                    humidity={`${d?.main.humidity}%`}
+                    sunrise={format(fromUnixTime(data?.city.sunrise ?? 107325628), "h:mm a")}
+                    sunset={format(fromUnixTime(data?.city.sunset ?? 1093772822), "h:mm a")}
+                    visability={metersToKm(d?.visibility ?? 1000)}
+                    windSpeed={`${d?.wind.speed} km/h`}
+                  />
+            
+          ))}
         </section>
 
       </main>
@@ -249,3 +236,4 @@ export default function Home() {
   );
 }
         
+
