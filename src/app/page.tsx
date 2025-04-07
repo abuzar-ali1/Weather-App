@@ -8,7 +8,6 @@ import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format, fromUnixTime, parseISO } from "date-fns";
-import { useState } from "react";
 import { metersToKm } from "@/utils/metersToKm";
 
 type WeatherData = {

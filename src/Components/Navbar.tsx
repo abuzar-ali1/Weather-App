@@ -23,12 +23,13 @@ export default function Navbar() {
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/find?q=${value}&appid=3f2dad944555842efaa81613814063d3`
         );
-        const suggestions = response.data.list.map((item: any) => item.name);
-        
+        const suggestions = response.data.list.map((item : string) => item.name);
+        console.log(typeof(suggestions))
         setSuggestions(suggestions);
         setError("");
         setShowSuggestions(true);
       } catch (error) {
+        console.error("Error fetching suggestions:", error);
         setSuggestions([]);
         setShowSuggestions(false);
       }
@@ -37,7 +38,6 @@ export default function Navbar() {
       setShowSuggestions(false);
     }
   }
-  console.log(suggestions)
   function handleSuggestionClick(value : string){
     setCity(value)
     setShowSuggestions(false)
