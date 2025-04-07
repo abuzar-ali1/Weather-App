@@ -8,6 +8,8 @@ import {
 } from "react-icons/md";
 import SearchBox from "./SearchBox";
 import axios from "axios";
+import { loadingCityAtom, placeAtom } from "@/app/atom";
+import { useAtom } from "jotai";
 
 // only the bits of the API payload we care about
 interface CityItem {
@@ -17,13 +19,16 @@ interface CityItem {
 interface FindResponse {
   list: CityItem[];
 }
-
-export default function Navbar() {
+type Props ={
+  location: string
+}
+export default function Navbar({location}: Props) {
   const [city, setCity] = useState<string>("")
   const [error, setError] = useState<string>("")
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-
+  const[, setPlace] = useAtom(placeAtom);
+  const[, setLoading] = useAtom(loadingCityAtom);
   async function handleInputChange(value: string) {
     setCity(value);
     if (value.length >= 3) {
@@ -55,19 +60,52 @@ export default function Navbar() {
     setShowSuggestions(false);
     setError("");
   }
+  function handleCurrentLocationClick() {
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(async(position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const response = await axios.get(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=3f2dad944555842efaa81613814063d3`
+          );
+
+          setTimeout(() => {
+            setPlace(response.data.name);
+            setCity(response.data.name);
+            setLoading(false);
+          }, 500);
+          // setCity(response.data.city.name);
+          // setPlace(response.data.list[0].name);
+          // setShowSuggestions(false);
+        } catch (err: unknown) {
+          console.error("Location lookup failed:", err)
+          setError("Unable to fetch location suggestions")
+          setLoading(false)
+        }
+      })
+    }
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    setLoading(true);
     e.preventDefault();
     if (suggestions.length === 0) {
       setError("Location not found");
+      setLoading(false);
     } else {
       setError("");
-      setShowSuggestions(false)
-      // TODO: fetch & display weather for `city`
+      setTimeout(() => {
+        setPlace(city);
+        setShowSuggestions(false)
+        setLoading(false);
+      }, 500);
+      
     }
   }
 
   return (
+    <>
     <nav className="shadow-sm w-screen sticky top-0 left-0 z-50 bg-white">
       <div className="h-[70px] flex justify-between items-center max-w-7xl px-3 mx-auto">
         <div className="flex justify-center items-center gap-2">
@@ -76,12 +114,15 @@ export default function Navbar() {
         </div>
 
         <section className="flex items-center gap-3">
-          <MdOutlineMyLocation className="text-2xl text-gray-400 hover:opacity-80 cursor-pointer" />
+          <MdOutlineMyLocation 
+            onClick={handleCurrentLocationClick}
+            title="Your Current Location"
+            className="text-2xl text-gray-400 hover:opacity-80 cursor-pointer" />
           <MdOutlineLocationOn className="text-2xl" />
-          <p className="text-state-900/80 text-sm">Pakistan</p>
+          <p className="text-state-900/80 text-sm">{location}</p>
 
           {/* search + suggestions */}
-          <div className="relative">
+          <div className="relative hidden md:flex">
             <SearchBox
               value={city}
               onChange={(e) => handleInputChange(e.target.value)}
@@ -97,6 +138,22 @@ export default function Navbar() {
         </section>
       </div>
     </nav>
+    <section className="flex max-w-7xl px-3 md:hidden">
+        <div className="relative ">
+            <SearchBox
+              value={city}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onSubmit={handleSubmit}
+            />
+            <SuggestionBox
+              error={error}
+              suggestions={suggestions}
+              showSuggestions={showSuggestions}
+              handleSuggestionClick={handleSuggestionClick}
+            />
+        </div>
+    </section>
+    </>
   );
 }
 

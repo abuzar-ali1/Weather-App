@@ -9,6 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format, fromUnixTime, parseISO } from "date-fns";
 import { metersToKm } from "@/utils/metersToKm";
+import { useAtom } from "jotai";
+import React, { useEffect } from "react";
+import { loadingCityAtom, placeAtom } from "./atom";
 
 type WeatherData = {
   cod: string;
@@ -80,18 +83,25 @@ type Coordinates = {
 };
 
 export default function Home() {
+    const[place,] = useAtom(placeAtom);
+    const[loading, ] = useAtom(loadingCityAtom);
+    
 
-  const { isPending, data } = useQuery<WeatherData>({
+  const { isPending, data , refetch } = useQuery<WeatherData>({
     queryKey: ["repoData"],
     queryFn: async () => {
       const { data } = await axios.get(
-        "https://api.openweathermap.org/data/2.5/forecast?q=khairpur&appid=3f2dad944555842efaa81613814063d3&units=metric"
+        `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=3f2dad944555842efaa81613814063d3&units=metric`
       );
 
       return data;
     },
   });
 
+  useEffect(() => {    
+  refetch();   
+  }, [place , refetch]);
+  
 // Create a unique array of dates (in "YYYY-MM-DD" format)
   const uniqueDates = [
     ...new Set(
@@ -129,12 +139,14 @@ export default function Home() {
         <p className="animate-bounce">Loading...</p>
       </div>
     );
-
-  return (
-    <div className="flex flex-col items-center gap-4 bg-gray-100 min-h-screen">
-      <Navbar/>
-
+    
+    return (
+      <div className="flex flex-col items-center gap-4 bg-gray-100 min-h-screen">
+      <Navbar location={data?.city.name ?? ""}/>
+      
       <main className="px-3 max-w-7xl max-auto flex flex-col gap-9 w-full pb-10 pt-4">
+      {loading ? (<SkeletonWeather/>): 
+       ( <>
         <section className="space-y-4">
           <div className="space-y-2">
             {/* Today data and day */}
@@ -203,7 +215,6 @@ export default function Home() {
             </Container>
           </div>
         </section>
-
         {/* 7 day forecast data */}
 
         <section className="flex  w-full flex-col gap-4">
@@ -229,10 +240,76 @@ export default function Home() {
             
           ))}
         </section>
-
+          </>)}
       </main>
     </div>
   );
 }
-        
+
+
+// Skeleton component
+// This component is used to show a loading state while the data is being fetched
+
+
+function SkeletonWeather() {
+  return (
+    <main className="px-3 max-w-7xl mx-auto flex flex-col gap-9 w-full pb-10 pt-4 animate-pulse">
+      {/* Today's Weather Skeleton */}
+      <section className="space-y-4">
+        <div className="space-y-2">
+          <div className="h-6 bg-gray-200 rounded w-40" />
+
+          <div className="flex gap-10 px-6 items-center">
+            <div className="flex flex-col gap-2 px-4">
+              <div className="h-12 w-20 bg-gray-200 rounded" />
+              <div className="h-3 w-24 bg-gray-200 rounded" />
+              <div className="h-3 w-20 bg-gray-200 rounded" />
+            </div>
+
+            <div className="flex flex-nowrap gap-6 overflow-x-auto w-full px-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2 text-xs items-center font-semibold min-w-[60px]"
+                >
+                  <div className="h-3 w-12 bg-gray-200 rounded" />
+                  <div className="h-8 w-8 bg-gray-200 rounded-full" />
+                  <div className="h-3 w-6 bg-gray-200 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Description & Details */}
+        <div className="flex gap-4">
+          <div className="w-40 h-32 bg-gray-200 rounded flex flex-col justify-center items-center gap-3 px-4" />
+          <div className="flex-1 h-32 bg-yellow-200/70 rounded px-6 flex items-center gap-6 overflow-x-auto">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="w-20 h-16 bg-gray-200 rounded" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7 Day Forecast Skeleton */}
+      <section className="flex w-full flex-col gap-4">
+        <div className="h-6 w-48 bg-gray-200 rounded" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="w-full h-24 bg-gray-200 rounded flex justify-between px-6 items-center"
+          >
+            <div className="w-20 h-6 bg-gray-300 rounded" />
+            <div className="w-16 h-6 bg-gray-300 rounded" />
+            <div className="w-16 h-6 bg-gray-300 rounded" />
+            <div className="w-16 h-6 bg-gray-300 rounded" />
+            <div className="w-16 h-6 bg-gray-300 rounded" />
+          </div>
+        ))}
+      </section>
+    </main>
+  );
+}
+
 
