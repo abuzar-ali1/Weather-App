@@ -23,8 +23,7 @@ export default function Navbar() {
         const response = await axios.get(
           `https://api.openweathermap.org/data/2.5/find?q=${value}&appid=3f2dad944555842efaa81613814063d3`
         );
-        const suggestions = response.data.list.map((item : string) => item.name);
-        console.log(typeof(suggestions))
+        const suggestions = response.data.list.map((item : any) => item.name);
         setSuggestions(suggestions);
         setError("");
         setShowSuggestions(true);
