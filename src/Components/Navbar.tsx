@@ -75,9 +75,7 @@ export default function Navbar({location}: Props) {
             setCity(response.data.name);
             setLoading(false);
           }, 500);
-          // setCity(response.data.city.name);
-          // setPlace(response.data.list[0].name);
-          // setShowSuggestions(false);
+          
         } catch (err: unknown) {
           console.error("Location lookup failed:", err)
           setError("Unable to fetch location suggestions")
@@ -95,8 +93,8 @@ export default function Navbar({location}: Props) {
       setLoading(false);
     } else {
       setError("");
+      setPlace(city);
       setTimeout(() => {
-        setPlace(city);
         setShowSuggestions(false)
         setLoading(false);
       }, 500);
